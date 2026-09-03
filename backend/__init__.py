@@ -1,8 +1,8 @@
 import socketio
 import eventlet
 
-from sockets.ai_messages_sockets import register_ai_messages_sockets
-from sockets.lifecycle_sockets import register_lifecycle_sockets
+from backend.sockets.ai_messages_sockets import register_ai_messages_sockets
+from backend.sockets.lifecycle_sockets import register_lifecycle_sockets
 
 from services.ai_service import generate_claude_message
 from config import sio
