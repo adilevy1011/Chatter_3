@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 
 from backend.services.ai_service import generate_claude_message
-from backend.services.supabase_service import ai_messages
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from backend.config import sio
