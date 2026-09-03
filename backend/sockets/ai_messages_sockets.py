@@ -13,6 +13,7 @@ def register_ai_messages_sockets():
     @sio.on('ai_message')
     def handle_message(sid, message):
         print(f"Message from {sid}: {message}")
+        ai_messages = [] #placeholder
         ai_messages.append(
             {
                 "role": "user",
@@ -20,10 +21,10 @@ def register_ai_messages_sockets():
             },
         )
         response = generate_claude_message(messages=ai_messages)
-        ai_messages.append(
-            {
-                "role":"assistant",
-                "content":response
-            }
-        )
+        # ai_messages.append(
+        #     {
+        #         "role":"assistant",
+        #         "content":response
+        #     }
+        # )
         return response
