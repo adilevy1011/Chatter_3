@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from config import sio
+from backend.config import sio
 def register_lifecycle_sockets():
     @sio.event
     def connect(sid, environ):

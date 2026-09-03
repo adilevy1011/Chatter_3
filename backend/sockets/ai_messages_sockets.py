@@ -4,11 +4,11 @@ import anthropic
 import sys
 from pathlib import Path
 
-from services.ai_service import generate_claude_message
-from services.supabase_service import ai_messages
+from backend.services.ai_service import generate_claude_message
+from backend.services.supabase_service import ai_messages
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from config import sio
+from backend.config import sio
 def register_ai_messages_sockets():
     @sio.on('ai_message')
     def handle_message(sid, message):

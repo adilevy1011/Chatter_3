@@ -3,7 +3,7 @@ from pathlib import Path
 import anthropic
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from config import CLAUDE_API_KEY 
+from backend.config import CLAUDE_API_KEY 
 anthropic_client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
 
 def generate_claude_message(messages):
