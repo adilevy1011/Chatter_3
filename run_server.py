@@ -1,5 +1,7 @@
-import eventlet
 from backend import create_app
+from backend.config import sio
+
+
 if __name__=='__main__':
     app = create_app()
-    eventlet.wsgi.server(eventlet.listen(('0.0.0.0',5678)),app)
+    sio.run(app, host="0.0.0.0", port=5678)

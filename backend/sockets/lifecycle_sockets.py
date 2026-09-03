@@ -1,14 +1,15 @@
 import sys
 from pathlib import Path
+from flask import request
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from backend.config import sio
 def register_lifecycle_sockets():
-    @sio.event
-    def connect(sid, environ):
-        print(f"Client connceted: {sid}")
+    @sio.on('connect')
+    def connect():
+        print(f"Client connceted: {request.sid}")
 
-    @sio.event
-    def disconnect(sid):
-        print(f"Client disconnected: {sid}")
+    @sio.on('disconnect')
+    def disconnect():
+        print(f"Client disconnected: {request.sid}")
