@@ -38,7 +38,7 @@ def handle_message(sid, message):
 
 if __name__=='__main__':
     print("Starting server...")
-    eventlet.wsgi.server(eventlet.listen(('127.0.0.1',5678)),app)
+    eventlet.wsgi.server(eventlet.listen(('0.0.0.0',5678)),app)
 
 
 
