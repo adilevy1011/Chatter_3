@@ -8,9 +8,9 @@ def login(email,password):
         return response
     except Exception as e:
         return f"Login failed: {str(e)}"
-def signup(email,password):
+def signup(email,password,username,full_name=None,avatar_url=None):
     try:
-        response = sio.call('signup',{'email': email, 'password': password},timeout=15)
+        response = sio.call('signup',{'email': email, 'password': password,'username':username,'full_name':full_name,'avatar_url':avatar_url},timeout=15)
         print("Server response:", response)
         return response
     except Exception as e:

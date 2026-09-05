@@ -1,12 +1,23 @@
 from . import supabase
 
 
-def sign_up_user(email, password):
+def sign_up_user(email, password,username=None,full_name=None,avatar_url=None):
     response = supabase.auth.sign_up({
         "email": email,
         "password": password,
+        "options": {
+            "data": {
+                "display_name": username,
+                "full_name": full_name
+            }
+        }
     })
-    print("Supabase response received:", response)
+    if response.user is not None:
+        profiles_response = (
+            supabase.table("profiles")
+            .insert({'id':response.user.id,'username':username,'full_name':full_name,'avatar_url':avatar_url})
+            .execute()
+        )
     return response
 
 def login_user(email, password):

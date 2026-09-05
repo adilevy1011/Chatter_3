@@ -10,7 +10,7 @@ def build_login_view(
     page.title = "Chatter - login"
     page.window.icon = "chatter-icon2.ico"
     
-    #username_input = ft.TextField(label="username", width=300)
+    username_input = ft.TextField(label="username", width=300,visible=False)
     login_header = ft.Text("Log into your Chatter account")
     email_input = ft.TextField(label="Email", width=300)
     password_input = ft.TextField(label="Password",width=300,password=True,can_reveal_password=True,)
@@ -38,13 +38,13 @@ def build_login_view(
                 )
                 page.update()
     async def signup_button_clicked(e):
-            if not email_input.value or not password_input.value:
+            if not email_input.value or not password_input.value or not username_input.value:
                 confirmation_text.value = "One or more fields are missing"
                 page.update()
             else:
                 
                 email_input.error_text = None
-                signup_response = signup(email_input.value,password_input.value)
+                signup_response = signup(email_input.value,password_input.value,username_input.value)
                 if isinstance(signup_response, dict) and signup_response.get('success'):
                     confirmation_text.value = 'Account created. Taking you there...'
                     await on_authenticated()
@@ -65,6 +65,7 @@ def build_login_view(
             login_header.value = 'Log into your Chatter account'
         submit_login_button.visible = not submit_login_button.visible
         submit_signup_button.visible = not submit_signup_button.visible
+        username_input.visible = not username_input.visible
         if signup_mode:
             toggle_button.content = "Already have an account? Sign in"
         else:
@@ -87,12 +88,13 @@ def build_login_view(
         controls=[
             login_header,
             email_input,
+            username_input,
             password_input,
             confirmation_text,
             submit_login_button,
             submit_signup_button,
             toggle_button,
-
+            
         ],
         vertical_alignment=ft.MainAxisAlignment.CENTER,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,

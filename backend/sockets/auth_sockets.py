@@ -20,7 +20,7 @@ def register_auth_sockets():
     def signup(data):
         print("Backend received data:", data)
         try:
-            sign_up_user(data['email'],data['password'])
+            sign_up_user(data['email'],data['password'],data['username'],data['full_name'],data['avatar_url'])
             return {'success':True}
         except Exception as e:
             return {'success': False, 'error': str(e)}
