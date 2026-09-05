@@ -29,3 +29,12 @@ def login_user(email, password):
         return response
     except Exception as e:
         raise Exception(f'Login failed: {str(e)}')
+
+def login_with_token_user(token):
+    try:
+        user_response = supabase.auth.get_user(token)
+        if not user_response or not user_response.user:
+            raise Exception("Invalid or expired session token")
+        return user_response
+    except Exception as e:
+        raise Exception(f'Token login failed: {str(e)}')

@@ -15,21 +15,10 @@ def connect():
 def disconnect():
     print("Disconnected from server")
 
-@sio.on('reply')
-def on_reply(data):
-    print(data)
-
-
-
-# Building app views
-
-
-
 def main(page: ft.Page):
     page.on_route_change = route_change
     page.route = "/login"
     route_change(page=page)
-
 
 if __name__ == '__main__':
     sio.connect('http://127.0.0.1:5678')
