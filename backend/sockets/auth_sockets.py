@@ -4,14 +4,15 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from backend.config import sio
-from backend.services.supabase.auth import login_user, sign_up_user, login_with_token_user
+from backend.services.supabase.auth import login_user, sign_up_user, login_with_token_user, logout_user,get_user_profile
 
 
 def auth_result(response):
     session = getattr(response, "session", None)
     return {
         "success": True,
-        "token": session.access_token if session is not None else None,
+        "access_token": session.access_token if session is not None else None,
+        "refresh_token": session.refresh_token if session is not None else None,
         "user": response.user.id if response.user is not None else None,
     }
 
@@ -45,15 +46,23 @@ def register_auth_sockets():
     @sio.on('login_with_token')
     def login_with_token(data):
         try:
-            token = data.get('token')
-            if not token:
-                return {'success': False, 'error': 'Token is missing'}
+            access_token = data.get('access_token')
+            refresh_token = data.get('refresh_token')
+            if not access_token or not refresh_token:
+                return {'success': False, 'error': 'Session tokens are missing'}
 
-            res = login_with_token_user(token)
-            return {
-                'success': True,
-                'user': res.user.id if res.user else None
-            }
+            return auth_result(
+                login_with_token_user(access_token, refresh_token)
+            )
         except Exception as e:
             return {'success': False, 'error': str(e)}
+
+    @sio.on('signout')
+    def signout_user():
+        logout_user()
+
+    @sio.on('fetch_user_profile')
+    def get_profile():
+        response = get_profile()
+        return response
         

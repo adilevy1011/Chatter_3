@@ -6,14 +6,15 @@ from pathlib import Path
 
 TOKEN_FILE = Path.home() / ".chatter_session.json"
 
-def save_token(token: str):
-    TOKEN_FILE.write_text(json.dumps({"auth_token": token}))
+def save_token(tokens: dict[str, str]):
+    TOKEN_FILE.write_text(json.dumps(tokens))
 
-def load_token() -> str | None:
+def load_token() -> dict[str, str] | None:
     if TOKEN_FILE.exists():
         try:
             data = json.loads(TOKEN_FILE.read_text())
-            return data.get("auth_token")
+            if data.get("access_token") and data.get("refresh_token"):
+                return data
         except Exception:
             return None
     return None
@@ -39,13 +40,16 @@ def build_login_view(
     signup_mode = False
 
     async def check_auto_login():
-        stored_token = load_token()
-        if stored_token:
+        stored_tokens = load_token()
+        if stored_tokens:
             confirmation_text.color = ft.Colors.BLUE
             confirmation_text.value = "Restoring session..."
             page.update()
             
-            token_response = login_with_token(stored_token)
+            token_response = login_with_token(
+                stored_tokens["access_token"],
+                stored_tokens["refresh_token"],
+            )
             if isinstance(token_response, dict) and token_response.get('success'):
                 confirmation_text.color = ft.Colors.GREEN
                 confirmation_text.value = "Session restored! Redirecting..."
@@ -67,8 +71,11 @@ def build_login_view(
             email_input.error_text = None
             login_response = login(email_input.value, password_input.value)
             if isinstance(login_response, dict) and login_response.get('success'):
-                if 'token' in login_response and login_response['token']:
-                    save_token(login_response['token'])
+                if login_response.get('access_token') and login_response.get('refresh_token'):
+                    save_token({
+                        "access_token": login_response["access_token"],
+                        "refresh_token": login_response["refresh_token"],
+                    })
                 
                 confirmation_text.color = ft.Colors.GREEN
                 confirmation_text.value = 'Login successful. Taking you there...'
@@ -91,8 +98,11 @@ def build_login_view(
             email_input.error_text = None
             signup_response = signup(email_input.value, password_input.value, username_input.value)
             if isinstance(signup_response, dict) and signup_response.get('success'):
-                if 'token' in signup_response and signup_response['token']:
-                    save_token(signup_response['token'])
+                if signup_response.get('access_token') and signup_response.get('refresh_token'):
+                    save_token({
+                        "access_token": signup_response["access_token"],
+                        "refresh_token": signup_response["refresh_token"],
+                    })
 
                 confirmation_text.color = ft.Colors.GREEN
                 confirmation_text.value = 'Account created. Taking you there...'

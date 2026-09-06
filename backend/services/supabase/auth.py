@@ -30,11 +30,29 @@ def login_user(email, password):
     except Exception as e:
         raise Exception(f'Login failed: {str(e)}')
 
-def login_with_token_user(token):
+def login_with_token_user(access_token, refresh_token):
     try:
-        user_response = supabase.auth.get_user(token)
-        if not user_response or not user_response.user:
+        response = supabase.auth.set_session(access_token, refresh_token)
+        if not response.user or not response.session:
             raise Exception("Invalid or expired session token")
-        return user_response
+        return response
     except Exception as e:
         raise Exception(f'Token login failed: {str(e)}')
+
+def logout_user():
+    response = supabase.auth.sign_out()
+    return response
+
+def get_user_profile():
+    session = supabase.auth.get_session()
+    if session:
+        response = (
+            supabase.table('profiles')
+            .select('*')
+            .eq('id',session.user.id)
+            .single()
+            .execute()
+        )
+        return response
+    else:
+        raise Exception(f'Could not verify session')

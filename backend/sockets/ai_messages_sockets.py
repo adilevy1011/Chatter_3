@@ -8,6 +8,10 @@ from backend.services.supabase.ai import fetch_ai_chats, fetch_chat_messages, ma
 from backend.config import sio
 def register_ai_messages_sockets():
 
+    @sio.on('fetch_messages')
+    def get_messages(data):
+        fetch_chat_messages(data['thread_id'])
+
     @sio.on('fetch_ai_chats')
     def get_ai_chats():
         return fetch_ai_chats()

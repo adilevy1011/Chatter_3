@@ -9,9 +9,13 @@ def login(email,password):
     except Exception as e:
         return f"Login failed: {str(e)}"
 
-def login_with_token(token):
+def login_with_token(access_token, refresh_token):
     try:
-        response = sio.call('login_with_token', {'token': token}, timeout=15)
+        response = sio.call(
+            'login_with_token',
+            {'access_token': access_token, 'refresh_token': refresh_token},
+            timeout=15,
+        )
         print("Token server response:", response)
         return response
     except Exception as e:
@@ -24,3 +28,17 @@ def signup(email,password,username,full_name=None,avatar_url=None):
         return response
     except Exception as e:
         return f"signup failed: {str(e)}"
+
+def get_profile():
+    try:
+        response = sio.call('fetch_user_profile')
+        return response
+    except Exception as e:
+        return f"Could not get fetch profile details: {str(e)}"
+
+def logout():
+    try:
+        response = sio.call('signout')
+        return response
+    except Exception as e:
+        return f"Logout failed: {str(e)}"
