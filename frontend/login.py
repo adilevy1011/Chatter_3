@@ -1,5 +1,5 @@
 import flet as ft
-from auth import signup, login, login_with_token
+from auth import get_profile, signup, login, login_with_token
 from collections.abc import Awaitable, Callable
 import json
 from pathlib import Path
@@ -50,7 +50,15 @@ def build_login_view(
                 stored_tokens["access_token"],
                 stored_tokens["refresh_token"],
             )
-            if isinstance(token_response, dict) and token_response.get('success'):
+            profile_response = get_profile() if (
+                isinstance(token_response, dict)
+                and token_response.get("success")
+            ) else None
+            session_is_valid = (
+                isinstance(profile_response, dict)
+                and bool(profile_response.get("username"))
+            )
+            if session_is_valid:
                 confirmation_text.color = ft.Colors.GREEN
                 confirmation_text.value = "Session restored! Redirecting..."
                 page.update()

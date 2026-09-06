@@ -63,6 +63,8 @@ def register_auth_sockets():
 
     @sio.on('fetch_user_profile')
     def get_profile():
-        response = get_profile()
-        return response
-        
+        try:
+            response = get_user_profile()
+            return response
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
