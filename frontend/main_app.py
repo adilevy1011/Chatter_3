@@ -12,6 +12,7 @@ def build_main_view(page: ft.Page) -> ft.View:
                 leading=ft.Icon(ft.Icons.ACCOUNT_CIRCLE, size=40),
                 title=ft.Text(thread["thread_title"]),
                 subtitle=ft.Text("Last message snippet goes here..."),
+                data=thread["id"],
                 on_click=chat_clicked,
                 hover_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             )
@@ -23,8 +24,9 @@ def build_main_view(page: ft.Page) -> ft.View:
         chat_list.controls = build_chat_items()
         page.update()
 
-    def chat_clicked(e):
-        print(f"Selected chat: {e.control.data}")
+    async def chat_clicked(e):
+        thread_id = e.control.data
+        await page.push_route(f"/chat/{thread_id}")
     def get_username():
         profile_list = get_profile()
         username = profile_list['username']

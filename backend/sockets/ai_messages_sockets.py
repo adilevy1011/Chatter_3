@@ -10,7 +10,7 @@ def register_ai_messages_sockets():
 
     @sio.on('fetch_messages')
     def get_messages(data):
-        fetch_chat_messages(data['thread_id'])
+        return fetch_chat_messages(data['thread_id'])
 
     @sio.on('fetch_ai_chats')
     def get_ai_chats():
@@ -35,7 +35,7 @@ def register_ai_messages_sockets():
             'content':data['message']
         })
         response = generate_claude_message(messages)
-        send_ai_message()
+        send_ai_message(thread_id=data['thread_id'],user_message=data['message'],ai_response=response,)
         return response
     @sio.on('start_new_chat')
     def start_new_ai_chat(data):

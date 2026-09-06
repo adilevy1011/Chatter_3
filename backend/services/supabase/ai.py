@@ -34,7 +34,7 @@ def make_new_ai_chat(thread_title):
 def send_ai_message(thread_id,user_message,ai_response):
     session = supabase.auth.get_session()
     if session:
-        user_id = response.user.id
+        user_id = session.user.id
         response = (
             supabase.table('ai_chat_messages')
             .insert({'thread_id':thread_id,'user_id':user_id,
