@@ -1,6 +1,8 @@
 import flet as ft
 from handle_ai import get_chat_messages, get_ai_chats, send_ai_message
-
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import time
 def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
     page.title = "Chatter"
 
@@ -12,6 +14,16 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
             if chat['id'] == thread_id:
                 return chat['thread_title']
 
+    def get_formatted_timestamp(timestamp):
+        #2026-09-06 19:21:23.584143+00
+    
+        dt_utc = datetime.fromisoformat(timestamp)
+        dt_local = dt_utc.astimezone(None)
+        readable_date = dt_local.strftime("%B %d, %Y at %I:%M %p")
+
+        return readable_date
+
+
     
     messageBox = ft.TextField(hint_text="Type your message here...", width=1000)
     send_button =ft.Button(content="Send",on_click=lambda e: send_message(messageBox.value))
@@ -20,7 +32,8 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
             return
 
         response = send_ai_message(content, thread_id)
-        messages.controls.extend(build_message_items(content, response))
+        messages.controls.extend(build_message_items(content, response,(datetime.now().astimezone().strftime("%B %d, %Y at %I:%M %p")
+)))
         messageBox.value = ""
         page.update()
 
@@ -36,45 +49,64 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
               messages = []
         return messages
 
-    def message_bubble(content, alignment, color):
+    def message_bubble(content,timestamp ,alignment, color):
         return ft.Row(
             controls=[
                 ft.Container(
-                    content=ft.Markdown(
-                    value=content,
-                    selectable=True,
-                    extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
-                    code_theme="atom-one-dark",
+                    content=ft.Column(
+                        controls=[
+                            ft.Markdown(
+                                value=content,
+                                selectable=True,
+                                extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
+                                code_theme="atom-one-dark",
+                            ),
+                            ft.Text(
+                                value=timestamp,  
+                                size=10,
+                                color=ft.Colors.WHITE54,
+                            ),
+                        ],
+                        tight=True, 
+                        horizontal_alignment=ft.CrossAxisAlignment.START, 
+                        spacing=2,
+                        width=550,
                     ),
                     bgcolor=color,
                     padding=10,
                     border_radius=10,
                 )
             ],
+            
             alignment=alignment,
         )
 
-    def build_message_items(user_message, assistant_message):
+    def build_message_items(user_message, assistant_message, timestamp):
         return [
             message_bubble(
                 user_message,
-                ft.MainAxisAlignment.START,
-                ft.Colors.SURFACE_CONTAINER_HIGHEST,
+                timestamp,
+                ft.MainAxisAlignment.END,
+                ft.Colors.PRIMARY_CONTAINER,
             ),
             message_bubble(
                 assistant_message,
-                ft.MainAxisAlignment.END,
-                ft.Colors.PRIMARY_CONTAINER,
+                timestamp,
+                ft.MainAxisAlignment.START,
+                ft.Colors.SURFACE_CONTAINER_HIGHEST,
+
             ),
         ]
 
     def build_messages_items():
         items = []
         for message in get_messages():
+            timestamp = message['created_at']
             items.extend(
                 build_message_items(
                     message["user_message"],
                     message["assistant_message"],
+                    get_formatted_timestamp(timestamp)
                 )
             )
         return items

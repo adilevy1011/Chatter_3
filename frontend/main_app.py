@@ -28,10 +28,12 @@ def build_main_view(page: ft.Page) -> ft.View:
             for thread in get_ai_chats()
         ]
 
-    def new_chat(e):
-        start_new_ai_chat('new chat')
+    async def new_chat(e):
+        response = start_new_ai_chat('new chat')
         chat_list.controls = build_chat_items()
         page.update()
+        thread_id = response[0]["id"]
+        await page.push_route(f"/chat/{thread_id}")
 
     async def chat_clicked(e):
         thread_id = e.control.data
