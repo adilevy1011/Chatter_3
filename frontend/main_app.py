@@ -1,17 +1,26 @@
 import flet as ft
-from handle_ai import get_ai_chats,start_new_ai_chat
+from handle_ai import get_ai_chats,start_new_ai_chat,get_chat_messages
 from auth import logout, get_profile
 from login import clear_token
 def build_main_view(page: ft.Page) -> ft.View:
     page.title = "Chatter"
     page.window.icon = "chatter-icon2.ico"
-
+    
     def build_chat_items():
+        def get_last_message_preview(thread):
+            messages = get_chat_messages(thread_id=thread['id'])
+            if not messages:
+                return "no messages yet..."
+            else:
+                last_message = messages[-1]['assistant_message']
+                parse = last_message.split(maxsplit=10)[:10]
+                result = " ".join(parse) + "..."
+                return result
         return [
             ft.ListTile(
                 leading=ft.Icon(ft.Icons.ACCOUNT_CIRCLE, size=40),
                 title=ft.Text(thread["thread_title"]),
-                subtitle=ft.Text("Last message snippet goes here..."),
+                subtitle=ft.Text(get_last_message_preview(thread)),
                 data=thread["id"],
                 on_click=chat_clicked,
                 hover_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,

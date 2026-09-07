@@ -78,7 +78,8 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
                 )
             )
         return items
-
+    async def back_to_chats():
+        await page.push_route('/')
 
     messages = ft.ListView(
             controls=build_messages_items(),
@@ -92,6 +93,9 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
         appbar=ft.AppBar(
             title=ft.Text(value=get_chat_title(), weight=ft.FontWeight.BOLD, size=27),
             bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+            actions=[
+                ft.Button('Back to chats',on_click=back_to_chats)
+            ]
         ),
         controls=[
             ft.Text("", style=ft.TextStyle(size=20, weight=ft.FontWeight.BOLD)),
