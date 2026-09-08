@@ -34,8 +34,14 @@ def register_ai_messages_sockets():
             'role':'user',
             'content':data['message']
         })
-        response = generate_claude_message(messages)
-        send_ai_message(thread_id=data['thread_id'],user_message=data['message'],ai_response=response,)
+        thinking_enabled = data["thinking"] == "Thinking"
+        response = generate_claude_message(messages, thinking_enabled)
+        send_ai_message(
+            thread_id=data['thread_id'],
+            user_message=data['message'],
+            ai_response=response["response"],
+            thinking=response.get("thinking", ""),
+        )
         return response
     @sio.on('start_new_chat')
     def start_new_ai_chat(data):

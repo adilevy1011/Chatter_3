@@ -1,7 +1,7 @@
 from socket_client import sio
 
-def send_ai_message(message,thread_id):
-    return sio.call('send_ai_message',{'message':message,'thread_id':thread_id})
+def send_ai_message(message,thread_id,thinking):
+    return sio.call('send_ai_message',{'message':message,'thread_id':thread_id,'thinking':thinking})
 
 def start_new_ai_chat(title):
     return sio.call('start_new_chat', {'title': title})

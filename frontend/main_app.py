@@ -13,6 +13,8 @@ def build_main_view(page: ft.Page) -> ft.View:
                 return "no messages yet..."
             else:
                 last_message = messages[-1]['assistant_message']
+                if isinstance(last_message, dict):
+                    last_message = last_message.get("response", "")
                 parse = last_message.split(maxsplit=10)[:10]
                 result = " ".join(parse) + "..."
                 return result

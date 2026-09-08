@@ -31,14 +31,14 @@ def make_new_ai_chat(thread_title):
     else:
         raise Exception("Could not verify valid session")
 
-def send_ai_message(thread_id,user_message,ai_response):
+def send_ai_message(thread_id,user_message,ai_response,thinking):
     session = supabase.auth.get_session()
     if session:
         user_id = session.user.id
         response = (
             supabase.table('ai_chat_messages')
             .insert({'thread_id':thread_id,'user_id':user_id,
-                        'user_message':user_message,'assistant_message':ai_response}).execute()
+                        'user_message':user_message,'assistant_message':ai_response,'ai_thinking':thinking}).execute()
         )
         return response.data
     else:
