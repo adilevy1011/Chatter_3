@@ -1,8 +1,3 @@
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
 from backend.config import sio
 from backend.services.supabase.auth import login_user, sign_up_user, login_with_token_user, logout_user,get_user_profile
 
@@ -20,7 +15,7 @@ def auth_result(response):
 def register_auth_sockets():
 
     @sio.on('login')
-    def login(data):
+    async def login(sid, data):
         try:
             return auth_result(login_user(data['email'], data['password']))
 
@@ -28,7 +23,7 @@ def register_auth_sockets():
             return {'success': False, 'error': str(e)}
 
     @sio.on('signup')
-    def signup(data):
+    async def signup(sid, data):
         print("Backend received data:", data)
         try:
             return auth_result(
@@ -44,7 +39,7 @@ def register_auth_sockets():
             return {'success': False, 'error': str(e)}
 
     @sio.on('login_with_token')
-    def login_with_token(data):
+    async def login_with_token(sid, data):
         try:
             access_token = data.get('access_token')
             refresh_token = data.get('refresh_token')
@@ -58,11 +53,11 @@ def register_auth_sockets():
             return {'success': False, 'error': str(e)}
 
     @sio.on('signout')
-    def signout_user():
+    async def signout_user(sid):
         logout_user()
 
     @sio.on('fetch_user_profile')
-    def get_profile():
+    async def get_profile(sid):
         try:
             response = get_user_profile()
             return response

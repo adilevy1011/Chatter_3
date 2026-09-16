@@ -1,23 +1,19 @@
-import sys
-from pathlib import Path
-
-from flask import request
 from backend.services.ai_service import generate_claude_message, generate_chat_title
-sys.path.append(str(Path(__file__).resolve().parent.parent))
 from backend.services.supabase.ai import fetch_ai_chats, fetch_chat_messages, make_new_ai_chat, send_ai_message, rename_ai_chat
 from backend.config import sio
+
 def register_ai_messages_sockets():
 
     @sio.on('fetch_messages')
-    def get_messages(data):
+    async def get_messages(sid, data):
         return fetch_chat_messages(data['thread_id'])
 
     @sio.on('fetch_ai_chats')
-    def get_ai_chats():
+    async def get_ai_chats(sid):
         return fetch_ai_chats()
 
     @sio.on('send_ai_message')
-    def send_message(data):
+    async def send_message(sid, data):
         new_chat = True
         messages_list = fetch_chat_messages(data['thread_id'])
         messages = []
@@ -49,5 +45,5 @@ def register_ai_messages_sockets():
         )
         return response
     @sio.on('start_new_chat')
-    def start_new_ai_chat(data):
+    async def start_new_ai_chat(sid, data):
         return make_new_ai_chat(data['title'])

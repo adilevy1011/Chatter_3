@@ -16,7 +16,7 @@ def main(page: ft.Page):
     route_change(page=page)
 
 if __name__ == '__main__':
-    sio.connect('http://127.0.0.1:5678')
+    sio.connect('http://127.0.0.1:5678') #147.182.235.138
     while not sio.connected:
          sio.sleep(0.1)
     ft.run(main=main,assets_dir='assets')

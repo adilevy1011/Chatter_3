@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask_socketio import SocketIO
+import socketio
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -12,10 +12,8 @@ SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
-sio = SocketIO(
-    async_mode="threading",
+sio = socketio.AsyncServer(
+    async_mode="asgi",
     logger=True,
-    cors_allowed_origins=[
-        "*"
-    ],
+    cors_allowed_origins="*",
 )

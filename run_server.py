@@ -1,7 +1,7 @@
 from backend import create_app
-from backend.config import sio
+import uvicorn
 
 
 if __name__=='__main__':
     app = create_app()
-    sio.run(app, host="0.0.0.0", port=5678)
+    uvicorn.run(app, host="0.0.0.0", port=5678)
