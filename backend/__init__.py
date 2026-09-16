@@ -21,14 +21,14 @@ SOCIAL_PREVIEW_TAGS = """
 <meta property="og:description" content="Chat with AI using Chatter.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://new.chatter-2.com/">
-<meta property="og:image" content="https://new.chatter-2.com/social-preview.png">
+<meta property="og:image" content="https://new.chatter-2.com/favicon.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Chatter">
 <meta name="twitter:description" content="Chat with AI using Chatter.">
-<meta name="twitter:image" content="https://new.chatter-2.com/social-preview.png">
+<meta name="twitter:image" content="https://new.chatter-2.com/favicon.png">
 """
 
 
