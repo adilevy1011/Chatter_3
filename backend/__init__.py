@@ -20,5 +20,5 @@ def create_app():
     register_ai_messages_sockets()
     register_lifecycle_sockets()
     register_auth_sockets()
-    app.mount("/", flet_fastapi.app(flet_frontend_main, assets_dir="assets"))
+    app.mount("/", flet_fastapi.app(flet_frontend_main.main, assets_dir="assets"))
     return app
