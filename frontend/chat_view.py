@@ -154,6 +154,9 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
             )
             if page.route != f"/chat/{thread_id}":
                 return
+            updated_title = await asyncio.to_thread(get_chat_title)
+            if updated_title:
+                chat_title.value = updated_title
             messages.controls.append(
                 message_bubble(
                     response.get("response", ""),
@@ -268,6 +271,12 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
     async def back_to_chats():
         await page.push_route('/')
 
+    chat_title = ft.Text(
+        value=get_chat_title(),
+        weight=ft.FontWeight.BOLD,
+        size=27,
+    )
+
     messages = ft.ListView(
             controls=build_messages_items(),
             expand=True,
@@ -278,7 +287,7 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
     return ft.View(
         route="/chat",
         appbar=ft.AppBar(
-            title=ft.Text(value=get_chat_title(), weight=ft.FontWeight.BOLD, size=27),
+            title=chat_title,
             bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             actions=[
                 ft.Button('Back to chats',on_click=back_to_chats)

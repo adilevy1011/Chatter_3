@@ -31,6 +31,17 @@ def make_new_ai_chat(thread_title):
     else:
         raise Exception("Could not verify valid session")
 
+def rename_ai_chat(thread_id,title):
+    response = (
+        supabase.table('ai_chat_threads')
+        .update({'thread_title':title})
+        .eq("id",thread_id)
+        .execute()
+        
+    )
+    return response.data
+
+
 def send_ai_message(thread_id,user_message,ai_response,thinking):
     session = supabase.auth.get_session()
     if session:

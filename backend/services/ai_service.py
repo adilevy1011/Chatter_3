@@ -22,7 +22,7 @@ def generate_claude_message(messages,thinking_on = False):
         return {"thinking":clean_thinking_text,"response":clean_text}
     else:
         response = anthropic_client.messages.create(
-            model="claude-opus-5",
+            model="claude-sonnet-5",
             max_tokens=1024,
             messages=messages
         )
@@ -30,3 +30,17 @@ def generate_claude_message(messages,thinking_on = False):
         clean_text = "\n".join(text_blocks)
 
         return {"response":clean_text}
+
+def generate_chat_title(messages):
+    response = anthropic_client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=1024,
+        system="""
+        You are a title generator. Write a short title (2-5 words) summarizing the beginning of this conversation.
+        DO NOT include any markdown. The title should be a summary of the tone of the conversation, attempting to predict what the user would be talking about. If there a clear topic, use it. If there is no clear topic use something simple and general.
+        """,
+        messages=messages
+    )
+    text_blocks = [block.text for block in response.content if block.type == "text"]
+    clean_text = "\n".join(text_blocks)
+    return clean_text

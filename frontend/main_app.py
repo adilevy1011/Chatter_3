@@ -2,33 +2,51 @@ import flet as ft
 from handle_ai import get_ai_chats,start_new_ai_chat,get_chat_messages
 from auth import logout, get_profile
 from login import clear_token
+from datetime import datetime, timezone
+
 def build_main_view(page: ft.Page) -> ft.View:
     page.title = "Chatter"
     page.window.icon = "chatter-icon2.ico"
     
     def build_chat_items():
-        def get_last_message_preview(thread):
+        def get_chat_info(thread):
             messages = get_chat_messages(thread_id=thread['id'])
             if not messages:
-                return "no messages yet..."
-            else:
-                last_message = messages[-1]['assistant_message']
-                if isinstance(last_message, dict):
-                    last_message = last_message.get("response", "")
-                parse = last_message.split(maxsplit=10)[:10]
-                result = " ".join(parse) + "..."
-                return result
-        return [
-            ft.ListTile(
-                leading=ft.Icon(ft.Icons.ACCOUNT_CIRCLE, size=40),
-                title=ft.Text(thread["thread_title"]),
-                subtitle=ft.Text(get_last_message_preview(thread)),
-                data=thread["id"],
-                on_click=chat_clicked,
-                hover_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+                return "no messages yet...", datetime.min.replace(tzinfo=timezone.utc)
+
+            latest_message = max(
+                messages,
+                key=lambda message: datetime.fromisoformat(
+                    message["created_at"].replace("Z", "+00:00")
+                ),
             )
-            for thread in get_ai_chats()
-        ]
+            last_message = latest_message["assistant_message"]
+            if isinstance(last_message, dict):
+                last_message = last_message.get("response", "")
+            parse = last_message.split(maxsplit=10)[:10]
+            return " ".join(parse) + "...", datetime.fromisoformat(
+                latest_message["created_at"].replace("Z", "+00:00")
+            )
+
+        chat_items = []
+        for thread in get_ai_chats():
+            preview, latest_message_at = get_chat_info(thread)
+            chat_items.append(
+                (
+                    latest_message_at,
+                    ft.ListTile(
+                        leading=ft.Icon(ft.Icons.ACCOUNT_CIRCLE, size=40),
+                        title=ft.Text(thread["thread_title"]),
+                        subtitle=ft.Text(preview),
+                        data=thread["id"],
+                        on_click=chat_clicked,
+                        hover_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+                    ),
+                )
+            )
+
+        chat_items.sort(key=lambda item: item[0], reverse=True)
+        return [item[1] for item in chat_items]
 
     async def new_chat(e):
         response = start_new_ai_chat('new chat')
