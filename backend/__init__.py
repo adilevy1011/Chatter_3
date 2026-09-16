@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 import flet.fastapi as flet_fastapi
@@ -28,7 +28,7 @@ SOCIAL_PREVIEW_TAGS = """
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Chatter">
 <meta name="twitter:description" content="Chat with AI using Chatter.">
-<meta name="twitter:image" content="https://new.chatter-2/social-preview.png">
+<meta name="twitter:image" content="https://new.chatter-2.com/social-preview.png">
 """
 
 
