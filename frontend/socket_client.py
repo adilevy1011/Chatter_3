@@ -1,7 +1,8 @@
 import asyncio
-import os
 
 import socketio
+
+from frontend.runtime_config import get_backend_url
 
 
 sio = socketio.AsyncClient(
@@ -24,7 +25,7 @@ async def ensure_connected():
             await sio.disconnect()
 
         await sio.connect(
-            os.getenv("SOCKETIO_URL", "http://127.0.0.1:5678"),
+            get_backend_url(),
             transports=["websocket"],
             namespaces=["/"],
         )
