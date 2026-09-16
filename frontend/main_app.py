@@ -1,7 +1,7 @@
 import flet as ft
-from handle_ai import get_ai_chats,start_new_ai_chat,get_chat_messages
-from auth import logout, get_profile
-from login import clear_token
+from frontend.handle_ai import get_ai_chats,start_new_ai_chat,get_chat_messages
+from frontend.auth import logout, get_profile
+from frontend.login import clear_token
 from datetime import datetime, timezone
 
 def build_main_view(page: ft.Page) -> ft.View:

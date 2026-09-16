@@ -1,5 +1,5 @@
 import flet as ft
-from auth import get_profile, signup, login, login_with_token
+from frontend.auth import get_profile, signup, login, login_with_token
 from collections.abc import Awaitable, Callable
 import json
 from pathlib import Path

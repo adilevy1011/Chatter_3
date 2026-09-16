@@ -1,4 +1,4 @@
-from socket_client import sio
+from frontend.socket_client import sio
 
 def send_ai_message(message,thread_id,thinking):
     return sio.call('send_ai_message',{'message':message,'thread_id':thread_id,'thinking':thinking})

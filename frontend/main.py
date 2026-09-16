@@ -1,6 +1,6 @@
-from socket_client import sio
+from frontend.socket_client import sio
 import flet as ft
-from route_handling import route_change
+from frontend.route_handling import route_change
 
 @sio.event
 def connect():

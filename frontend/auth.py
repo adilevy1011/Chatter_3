@@ -1,5 +1,5 @@
 
-from socket_client import sio
+from frontend.socket_client import sio
 
 def login(email,password):
     try:

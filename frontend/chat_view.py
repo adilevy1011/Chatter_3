@@ -1,5 +1,5 @@
 import flet as ft
-from handle_ai import get_chat_messages, get_ai_chats, send_ai_message
+from frontend.handle_ai import get_chat_messages, get_ai_chats, send_ai_message
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import time

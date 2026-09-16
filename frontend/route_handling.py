@@ -1,6 +1,6 @@
-from login import build_login_view
-from main_app import build_main_view
-from chat_view import build_chat_view
+from frontend.login import build_login_view
+from frontend.main_app import build_main_view
+from frontend.chat_view import build_chat_view
 import flet as ft
 from urllib.parse import unquote
 
