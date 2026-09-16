@@ -7,7 +7,8 @@ from datetime import datetime, timezone
 def build_main_view(page: ft.Page) -> ft.View:
     page.title = "Chatter"
     page.window.icon = "chatter-icon2.ico"
-    
+
+    page_title = ft.Text("Messages", style=ft.TextStyle(size=20, weight=ft.FontWeight.BOLD))
     def build_chat_items():
         def get_chat_info(thread):
             messages = get_chat_messages(thread_id=thread['id'])
@@ -131,7 +132,7 @@ def build_main_view(page: ft.Page) -> ft.View:
             ],
         ),
         controls=[
-            ft.Text("Messages", style=ft.TextStyle(size=20, weight=ft.FontWeight.BOLD)),
+            page_title,
             new_chat_button,
             chat_list,
             
