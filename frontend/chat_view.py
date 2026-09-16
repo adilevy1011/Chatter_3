@@ -1,5 +1,6 @@
 import flet as ft
 from frontend.handle_ai import get_chat_messages, get_ai_chats, send_ai_message
+from frontend.branding import WINDOW_ICON
 from datetime import datetime
 import asyncio
 
@@ -10,7 +11,6 @@ class TypingIndicator(ft.Row):
         self.spacing = 4
         self.vertical_alignment = ft.CrossAxisAlignment.CENTER
         
-        # Create three dot containers with offset animation enabled
         self.dot1 = self._create_dot()
         self.dot2 = self._create_dot()
         self.dot3 = self._create_dot()
@@ -71,7 +71,7 @@ class TypingIndicator(ft.Row):
 async def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
     page.title = "Chatter"
 
-    page.window.icon = "chatter-icon2.ico"
+    page.window.icon = WINDOW_ICON
 
     async def get_chat_title():
         ai_chats = await get_ai_chats()

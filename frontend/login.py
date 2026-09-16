@@ -1,5 +1,6 @@
 import flet as ft
 from frontend.auth import signup, login, login_with_token
+from frontend.branding import WINDOW_ICON
 from collections.abc import Awaitable, Callable
 import json
 
@@ -46,7 +47,7 @@ def build_login_view(
     preferences = ft.SharedPreferences()
 
     page.title = "Chatter - login"
-    page.window.icon = "chatter-icon2.ico"
+    page.window.icon = WINDOW_ICON
     
     username_input = ft.TextField(label="username", width=300, visible=False)
     login_header = ft.Text("Log into your Chatter account")

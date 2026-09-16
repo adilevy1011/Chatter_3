@@ -1,13 +1,14 @@
 import flet as ft
 from frontend.handle_ai import get_ai_chats,start_new_ai_chat,get_chat_messages
 from frontend.auth import logout, get_profile
+from frontend.branding import WINDOW_ICON
 from frontend.login import clear_token
 from datetime import datetime, timezone
 
 async def build_main_view(page: ft.Page) -> ft.View:
     preferences = ft.SharedPreferences()
     page.title = "Chatter"
-    page.window.icon = "chatter-icon2.ico"
+    page.window.icon = WINDOW_ICON
 
     page_title = ft.Text("Messages", style=ft.TextStyle(size=20, weight=ft.FontWeight.BOLD))
     async def build_chat_items():
