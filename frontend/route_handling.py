@@ -6,7 +6,6 @@ from urllib.parse import unquote
 
 
 async def navigate_to_main(page: ft.Page):
-    page.route = "/"
     await page.push_route("/")
 
 
