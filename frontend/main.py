@@ -10,7 +10,13 @@ def connect():
 def disconnect():
     print("Disconnected from server")
 
-def main(page: ft.Page):
+if not sio.connected:
+    sio.connect('https://chatter-2.com', transports=['websocket'])
+
+async def main(page: ft.Page):
+    if not sio.connected:
+        await sio.wait() 
+
     page.on_route_change = route_change
     page.route = "/login"
     route_change(page=page)
