@@ -2,32 +2,40 @@ import flet as ft
 from frontend.auth import get_profile, signup, login, login_with_token
 from collections.abc import Awaitable, Callable
 import json
-from pathlib import Path
 
-TOKEN_FILE = Path.home() / ".chatter_session.json"
+TOKEN_KEY = "com.chatter-2.session"
 
-def save_token(tokens: dict[str, str]):
-    TOKEN_FILE.write_text(json.dumps(tokens))
 
-def load_token() -> dict[str, str] | None:
-    if TOKEN_FILE.exists():
-        try:
-            data = json.loads(TOKEN_FILE.read_text())
-            if data.get("access_token") and data.get("refresh_token"):
-                return data
-        except Exception:
+async def save_token(
+    preferences: ft.SharedPreferences, tokens: dict[str, str]
+):
+    await preferences.set(TOKEN_KEY, json.dumps(tokens))
+
+
+async def load_token(
+    preferences: ft.SharedPreferences,
+) -> dict[str, str] | None:
+    try:
+        value = await preferences.get(TOKEN_KEY)
+        if not isinstance(value, str):
             return None
+        data = json.loads(value)
+        if data.get("access_token") and data.get("refresh_token"):
+            return data
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return None
     return None
 
-def clear_token():
-    if TOKEN_FILE.exists():
-        TOKEN_FILE.unlink()
+
+async def clear_token(preferences: ft.SharedPreferences):
+    await preferences.remove(TOKEN_KEY)
 
 
 def build_login_view(
     page: ft.Page, on_authenticated: Callable[[], Awaitable[None]]
 ) -> ft.View:
-    
+    preferences = ft.SharedPreferences()
+
     page.title = "Chatter - login"
     page.window.icon = "chatter-icon2.ico"
     
@@ -39,8 +47,19 @@ def build_login_view(
     confirmation_text = ft.Text('')
     signup_mode = False
 
+    async def finish_authentication(message: str):
+        confirmation_text.color = ft.Colors.GREEN
+        confirmation_text.value = message
+        page.update()
+        try:
+            await on_authenticated()
+        except Exception as error:
+            confirmation_text.color = ft.Colors.RED
+            confirmation_text.value = f"Could not open Chatter: {error}"
+            page.update()
+
     async def check_auto_login():
-        stored_tokens = load_token()
+        stored_tokens = await load_token(preferences)
         if stored_tokens:
             confirmation_text.color = ft.Colors.BLUE
             confirmation_text.value = "Restoring session..."
@@ -59,12 +78,9 @@ def build_login_view(
                 and bool(profile_response.get("username"))
             )
             if session_is_valid:
-                confirmation_text.color = ft.Colors.GREEN
-                confirmation_text.value = "Session restored! Redirecting..."
-                page.update()
-                await on_authenticated()
+                await finish_authentication("Session restored! Redirecting...")
             else:
-                clear_token()
+                await clear_token(preferences)
                 confirmation_text.value = ""
                 page.update()
 
@@ -80,15 +96,17 @@ def build_login_view(
             login_response = await login(email_input.value, password_input.value)
             if isinstance(login_response, dict) and login_response.get('success'):
                 if login_response.get('access_token') and login_response.get('refresh_token'):
-                    save_token({
-                        "access_token": login_response["access_token"],
-                        "refresh_token": login_response["refresh_token"],
-                    })
+                    await save_token(
+                        preferences,
+                        {
+                            "access_token": login_response["access_token"],
+                            "refresh_token": login_response["refresh_token"],
+                        },
+                    )
                 
-                confirmation_text.color = ft.Colors.GREEN
-                confirmation_text.value = 'Login successful. Taking you there...'
-                page.update()
-                await on_authenticated()
+                await finish_authentication(
+                    'Login successful. Taking you there...'
+                )
             else:
                 confirmation_text.color = ft.Colors.RED
                 confirmation_text.value = (
@@ -111,15 +129,17 @@ def build_login_view(
             )
             if isinstance(signup_response, dict) and signup_response.get('success'):
                 if signup_response.get('access_token') and signup_response.get('refresh_token'):
-                    save_token({
-                        "access_token": signup_response["access_token"],
-                        "refresh_token": signup_response["refresh_token"],
-                    })
+                    await save_token(
+                        preferences,
+                        {
+                            "access_token": signup_response["access_token"],
+                            "refresh_token": signup_response["refresh_token"],
+                        },
+                    )
 
-                confirmation_text.color = ft.Colors.GREEN
-                confirmation_text.value = 'Account created. Taking you there...'
-                page.update()
-                await on_authenticated()
+                await finish_authentication(
+                    'Account created. Taking you there...'
+                )
             else:
                 confirmation_text.color = ft.Colors.RED
                 confirmation_text.value = (

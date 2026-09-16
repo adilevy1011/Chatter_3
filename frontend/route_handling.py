@@ -6,6 +6,8 @@ from urllib.parse import unquote
 
 
 async def navigate_to_main(page: ft.Page):
+    page.route = "/"
+    await route_change(page=page)
     await page.push_route("/")
 
 
@@ -16,6 +18,8 @@ async def route_change(
         page = e.page
     if page is None:
         raise RuntimeError("A page is required to handle a route change")
+    if e is not None and page.views and page.views[-1].route == e.route:
+        return
     page.views.clear()
 
     if page.route == "/":

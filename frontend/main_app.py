@@ -5,6 +5,7 @@ from frontend.login import clear_token
 from datetime import datetime, timezone
 
 async def build_main_view(page: ft.Page) -> ft.View:
+    preferences = ft.SharedPreferences()
     page.title = "Chatter"
     page.window.icon = "chatter-icon2.ico"
 
@@ -65,7 +66,7 @@ async def build_main_view(page: ft.Page) -> ft.View:
 
     async def logout_clicked(e):
         await logout()
-        clear_token()
+        await clear_token(preferences)
         await page.push_route("/login")
 
     chat_list = ft.ListView(
