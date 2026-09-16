@@ -211,7 +211,7 @@ async def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
                             ft.Text(
                                 value=timestamp,  
                                 size=10,
-                                color=ft.Colors.WHITE54,
+                                color=ft.Colors.WHITE_54,
                             ),
                         ],
                         tight=True, 
