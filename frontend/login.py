@@ -1,5 +1,5 @@
 import flet as ft
-from frontend.auth import get_profile, signup, login, login_with_token
+from frontend.auth import signup, login, login_with_token
 from collections.abc import Awaitable, Callable
 import json
 
@@ -29,6 +29,15 @@ async def load_token(
 
 async def clear_token(preferences: ft.SharedPreferences):
     await preferences.remove(TOKEN_KEY)
+
+
+class SessionRestorer(ft.Container):
+    def __init__(self, restore: Callable[[], Awaitable[None]]):
+        super().__init__(width=0, height=0)
+        self._restore = restore
+
+    def did_mount(self):
+        self.page.run_task(self._restore)
 
 
 def build_login_view(
@@ -69,22 +78,30 @@ def build_login_view(
                 stored_tokens["access_token"],
                 stored_tokens["refresh_token"],
             )
-            profile_response = await get_profile() if (
-                isinstance(token_response, dict)
-                and token_response.get("success")
-            ) else None
-            session_is_valid = (
-                isinstance(profile_response, dict)
-                and bool(profile_response.get("username"))
-            )
-            if session_is_valid:
+            if isinstance(token_response, dict) and token_response.get("success"):
+                if (
+                    token_response.get("access_token")
+                    and token_response.get("refresh_token")
+                ):
+                    await save_token(
+                        preferences,
+                        {
+                            "access_token": token_response["access_token"],
+                            "refresh_token": token_response["refresh_token"],
+                        },
+                    )
                 await finish_authentication("Session restored! Redirecting...")
             else:
                 await clear_token(preferences)
-                confirmation_text.value = ""
+                confirmation_text.color = ft.Colors.RED
+                confirmation_text.value = (
+                    token_response.get("error", "Saved session has expired")
+                    if isinstance(token_response, dict)
+                    else str(token_response)
+                )
                 page.update()
 
-    page.run_task(check_auto_login)
+    session_restorer = SessionRestorer(check_auto_login)
 
     async def login_button_clicked(e):
         if not email_input.value or not password_input.value:
@@ -178,6 +195,7 @@ def build_login_view(
             submit_login_button,
             submit_signup_button,
             toggle_button,
+            session_restorer,
         ],
         vertical_alignment=ft.MainAxisAlignment.CENTER,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,

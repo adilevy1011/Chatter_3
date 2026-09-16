@@ -36,7 +36,7 @@ def login_with_token_user(access_token, refresh_token):
         if not response.user or not response.session:
             raise Exception("Invalid or expired session token")
 
-        verified_user = supabase.auth.get_user(access_token)
+        verified_user = supabase.auth.get_user(response.session.access_token)
         if not verified_user or not verified_user.user:
             raise Exception("Session could not be verified")
 
