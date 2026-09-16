@@ -30,6 +30,9 @@ def create_app():
         flet_fastapi.app(
             flet_frontend_main.main,
             assets_dir=str(ASSETS_DIR),
+            app_name="Chatter",
+            app_short_name="Chatter",
+            app_description="Chat freely and securly on Chatter!",
         ),
     )
     return socketio.ASGIApp(sio, other_asgi_app=app)
