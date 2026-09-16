@@ -4,14 +4,14 @@ from frontend.auth import logout, get_profile
 from frontend.login import clear_token
 from datetime import datetime, timezone
 
-def build_main_view(page: ft.Page) -> ft.View:
+async def build_main_view(page: ft.Page) -> ft.View:
     page.title = "Chatter"
     page.window.icon = "chatter-icon2.ico"
 
     page_title = ft.Text("Messages", style=ft.TextStyle(size=20, weight=ft.FontWeight.BOLD))
-    def build_chat_items():
-        def get_chat_info(thread):
-            messages = get_chat_messages(thread_id=thread['id'])
+    async def build_chat_items():
+        async def get_chat_info(thread):
+            messages = await get_chat_messages(thread_id=thread['id'])
             if not messages:
                 return "no messages yet...", datetime.min.replace(tzinfo=timezone.utc)
 
@@ -30,8 +30,8 @@ def build_main_view(page: ft.Page) -> ft.View:
             )
 
         chat_items = []
-        for thread in get_ai_chats():
-            preview, latest_message_at = get_chat_info(thread)
+        for thread in await get_ai_chats():
+            preview, latest_message_at = await get_chat_info(thread)
             chat_items.append(
                 (
                     latest_message_at,
@@ -50,8 +50,8 @@ def build_main_view(page: ft.Page) -> ft.View:
         return [item[1] for item in chat_items]
 
     async def new_chat(e):
-        response = start_new_ai_chat('new chat')
-        chat_list.controls = build_chat_items()
+        response = await start_new_ai_chat('new chat')
+        chat_list.controls = await build_chat_items()
         page.update()
         thread_id = response[0]["id"]
         await page.push_route(f"/chat/{thread_id}")
@@ -59,21 +59,17 @@ def build_main_view(page: ft.Page) -> ft.View:
     async def chat_clicked(e):
         thread_id = e.control.data
         await page.push_route(f"/chat/{thread_id}")
-    def get_username():
-        profile_list = get_profile()
-        username = profile_list['username']
-        return username
-    def get_email():
-        profile_list = get_profile()
-        email = profile_list['email']
-        return email
+    profile = await get_profile()
+    if not isinstance(profile, dict):
+        profile = {}
+
     async def logout_clicked(e):
-        logout()
+        await logout()
         clear_token()
         await page.push_route("/login")
 
     chat_list = ft.ListView(
-        controls=build_chat_items(),
+        controls=await build_chat_items(),
         expand=True,
         spacing=5,
         padding=10,
@@ -89,8 +85,8 @@ def build_main_view(page: ft.Page) -> ft.View:
                         leading=ft.Icon(ft.Icons.ALBUM, color=ft.Colors.BLUE),
                         title=ft.Text("Profile"),
                     ),
-                    ft.Text(f"Username: {get_username()}"),
-                    ft.Text(f'Email: {get_email()}'),
+                    ft.Text(f"Username: {profile.get('username', '')}"),
+                    ft.Text(f"Email: {profile.get('email', '')}"),
                     ft.Row(
                         [
                             ft.TextButton("Close", on_click=lambda _: close_profile_card()),

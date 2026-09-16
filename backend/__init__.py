@@ -16,9 +16,8 @@ def create_app():
         yield
         await flet_fastapi.app_manager.shutdown()
     app = FastAPI(lifespan=lifespan)
-    app.mount("/socket.io", socketio.ASGIApp(sio))
     register_ai_messages_sockets()
     register_lifecycle_sockets()
     register_auth_sockets()
     app.mount("/", flet_fastapi.app(flet_frontend_main.main, assets_dir="assets"))
-    return app
+    return socketio.ASGIApp(sio, other_asgi_app=app)

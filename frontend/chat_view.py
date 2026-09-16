@@ -1,8 +1,6 @@
 import flet as ft
 from frontend.handle_ai import get_chat_messages, get_ai_chats, send_ai_message
 from datetime import datetime
-from zoneinfo import ZoneInfo
-import time
 import asyncio
 
 class TypingIndicator(ft.Row):
@@ -70,13 +68,13 @@ class TypingIndicator(ft.Row):
                     raise
                 self._running = False
 
-def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
+async def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
     page.title = "Chatter"
 
     page.window.icon = "chatter-icon2.ico"
 
-    def get_chat_title():
-        ai_chats = get_ai_chats()
+    async def get_chat_title():
+        ai_chats = await get_ai_chats()
         for chat in ai_chats:
             if chat['id'] == thread_id:
                 return chat['thread_title']
@@ -149,12 +147,10 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
         try:
             if not await update_if_active():
                 return
-            response = await asyncio.to_thread(
-                send_ai_message, content, thread_id, thinking
-            )
+            response = await send_ai_message(content, thread_id, thinking)
             if page.route != f"/chat/{thread_id}":
                 return
-            updated_title = await asyncio.to_thread(get_chat_title)
+            updated_title = await get_chat_title()
             if updated_title:
                 chat_title.value = updated_title
             messages.controls.append(
@@ -176,8 +172,8 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
          
     )
 
-    def get_messages():
-        messages = get_chat_messages(thread_id)
+    async def get_messages():
+        messages = await get_chat_messages(thread_id)
         if messages is None:
               messages = []
         return messages
@@ -249,9 +245,9 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
             ),
         ]
 
-    def build_messages_items():
+    async def build_messages_items():
         items = []
-        for message in get_messages():
+        for message in await get_messages():
             timestamp = message['created_at']
             assistant_message = message["assistant_message"]
             if isinstance(assistant_message, dict):
@@ -268,17 +264,17 @@ def build_chat_view(page: ft.Page, thread_id: str) -> ft.View:
                 )
             )
         return items
-    async def back_to_chats():
+    async def back_to_chats(e):
         await page.push_route('/')
 
     chat_title = ft.Text(
-        value=get_chat_title(),
+        value=await get_chat_title(),
         weight=ft.FontWeight.BOLD,
         size=27,
     )
 
     messages = ft.ListView(
-            controls=build_messages_items(),
+            controls=await build_messages_items(),
             expand=True,
             spacing=5,
             padding=10,

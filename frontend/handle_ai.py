@@ -1,13 +1,23 @@
-from frontend.socket_client import sio
+from frontend.socket_client import ensure_connected, sio
 
-def send_ai_message(message,thread_id,thinking):
-    return sio.call('send_ai_message',{'message':message,'thread_id':thread_id,'thinking':thinking})
+async def send_ai_message(message, thread_id, thinking):
+    await ensure_connected()
+    return await sio.call(
+        'send_ai_message',
+        {'message': message, 'thread_id': thread_id, 'thinking': thinking},
+        namespace='/',
+    )
 
-def start_new_ai_chat(title):
-    return sio.call('start_new_chat', {'title': title})
+async def start_new_ai_chat(title):
+    await ensure_connected()
+    return await sio.call('start_new_chat', {'title': title}, namespace='/')
 
-def get_ai_chats():
-    return sio.call('fetch_ai_chats')
+async def get_ai_chats():
+    await ensure_connected()
+    return await sio.call('fetch_ai_chats', namespace='/')
 
-def get_chat_messages(thread_id):
-    return sio.call('fetch_messages',{'thread_id':thread_id})
+async def get_chat_messages(thread_id):
+    await ensure_connected()
+    return await sio.call(
+        'fetch_messages', {'thread_id': thread_id}, namespace='/'
+    )

@@ -46,11 +46,11 @@ def build_login_view(
             confirmation_text.value = "Restoring session..."
             page.update()
             
-            token_response = login_with_token(
+            token_response = await login_with_token(
                 stored_tokens["access_token"],
                 stored_tokens["refresh_token"],
             )
-            profile_response = get_profile() if (
+            profile_response = await get_profile() if (
                 isinstance(token_response, dict)
                 and token_response.get("success")
             ) else None
@@ -77,7 +77,7 @@ def build_login_view(
             page.update()
         else:
             email_input.error_text = None
-            login_response = login(email_input.value, password_input.value)
+            login_response = await login(email_input.value, password_input.value)
             if isinstance(login_response, dict) and login_response.get('success'):
                 if login_response.get('access_token') and login_response.get('refresh_token'):
                     save_token({
@@ -104,7 +104,11 @@ def build_login_view(
             page.update()
         else:
             email_input.error_text = None
-            signup_response = signup(email_input.value, password_input.value, username_input.value)
+            signup_response = await signup(
+                email_input.value,
+                password_input.value,
+                username_input.value,
+            )
             if isinstance(signup_response, dict) and signup_response.get('success'):
                 if signup_response.get('access_token') and signup_response.get('refresh_token'):
                     save_token({

@@ -8,10 +8,11 @@ from urllib.parse import unquote
 async def navigate_to_main(page: ft.Page):
     page.route = "/"
     await page.push_route("/")
-    route_change(page=page)
 
 
-def route_change(e: ft.RouteChangeEvent | None = None, page: ft.Page | None = None):
+async def route_change(
+    e: ft.RouteChangeEvent | None = None, page: ft.Page | None = None
+):
     if e is not None:
         page = e.page
     if page is None:
@@ -19,12 +20,12 @@ def route_change(e: ft.RouteChangeEvent | None = None, page: ft.Page | None = No
     page.views.clear()
 
     if page.route == "/":
-        page.views.append(build_main_view(page))
+        page.views.append(await build_main_view(page))
     elif page.route.startswith("/chat/"):
         thread_id = unquote(page.route.removeprefix("/chat/"))
         if not thread_id:
             raise RuntimeError("A thread ID is required to open a chat")
-        page.views.append(build_chat_view(page, thread_id))
+        page.views.append(await build_chat_view(page, thread_id))
     else:
         page.views.append(
             build_login_view(
