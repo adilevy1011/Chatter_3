@@ -16,7 +16,7 @@ def main(page: ft.Page):
     route_change(page=page)
 
 if __name__ == '__main__':
-    sio.connect('http://147.182.235.138',transports=['websocket']) #147.182.235.138
+    sio.connect('https://chatter-2.com',transports=['websocket']) #147.182.235.138
     while not sio.connected:
          sio.sleep(0.1)
     #ft.run(main=main,assets_dir='assets',view=ft.AppView.WEB_BROWSER)
